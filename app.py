@@ -17,15 +17,42 @@ def save_uploaded_img(directory, file):
 
 st.title('UNIST! Where is it?')
 
-
-st.subheader('Upload your photo 📷 ')
-img_file = st.file_uploader('► Upload Only UNIST Place ↓', type=['png', 'jpg', 'jpeg'])
-
 test_transforms = transforms.Compose([
     transforms.Resize((224, 224)),  # 테스트 데이터는 크기만 조정
     transforms.ToTensor(),
     transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
 ])
+
+# 기존 매핑 (class_to_idx)
+class_to_idx = {
+    '0': 0, '1': 1, '10': 2, '11': 3, '12': 4, '13': 5, '14': 6, '15': 7, '16': 8, '17': 9, '18': 10, '19': 11,
+    '2': 12, '20': 13, '21': 14, '22': 15, '23': 16, '24': 17, '25': 18, '26': 19, '27': 20, '28': 21, '29': 22,
+    '3': 23, '30': 24, '31': 25, '32': 26, '33': 27, '34': 28, '35': 29, '36': 30, '37': 31, '38': 32, '39': 33,
+    '4': 34, '40': 35, '41': 36, '42': 37, '43': 38, '44': 39, '45': 40, '46': 41, '47': 42, '48': 43, '49': 44,
+    '5': 45, '50': 46, '51': 47, '52': 48, '53': 49, '54': 50, '55': 51, '56': 52, '57': 53, '58': 54, '59': 55,
+    '6': 56, '60': 57, '61': 58, '62': 59, '63': 60, '64': 61, '65': 62, '66': 63, '67': 64, '68': 65, '69': 66,
+    '7': 67, '70': 68, '71': 69, '72': 70, '73': 71, '74': 72, '75': 73, '76': 74, '77': 75, '78': 76, '79': 77,
+    '8': 78, '80': 79, '81': 80, '82': 81, '83': 82, '84': 83, '85': 84, '86': 85, '87': 86, '9': 87
+}
+
+# 매핑을 뒤집기
+idx_to_class = {v: int(k) for k, v in class_to_idx.items()}
+
+# 예측된 값 -> 원래 클래스 이름으로 변환
+def get_original_class(predicted_label):
+    """
+    예측된 숫자를 원래 폴더 이름으로 변환
+    :param predicted_label: 모델이 예측한 레이블 (int)
+    :return: 원래 폴더 이름 (str)
+    """
+    return idx_to_class.get(predicted_label, "Unknown")  # 존재하지 않는 레이블이면 "Unknown" 반환
+
+
+
+
+st.subheader('Upload your photo 📷 ')
+img_file = st.file_uploader('► Upload Only UNIST Place ↓', type=['png', 'jpg', 'jpeg'])
+
 
 if img_file is not None:
      # save_uploaded_img('input_img', img_file)
@@ -35,21 +62,24 @@ if img_file is not None:
 
      # CUDA 환경 확인 및 map_location 설정
      device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-     model.load_state_dict(torch.load('./100_weight.pth', map_location=device))
+     model.load_state_dict(torch.load('./100_weights.pth', map_location=device))
 
      model = model.to(device)
      model.eval()  # 평가 모드로 설정
 
 
-     # 이미지를 numpy 배열로 변환하고 224x224 크기로 리사이즈
-     img = Image.open(img_file).convert('RGB')  # RGB로 변환 (Grayscale 방지)
+     # 이미지를 tensor로 변환
+     img = Image.open(img_file).convert("RGB")
      img_tensor = test_transforms(img).unsqueeze(0).to(device)  # img to tensor
     
      # 모델을 통해 예측 수행
      with torch.no_grad():
           output_class = model(img_tensor)  # 모델 출력 (logits)
-          output_class = F.softmax(output_class, dim=1)
+          # output_class = F.softmax(output_class, dim=1)
      predicted_class = torch.argmax(output_class, dim=1).item()  # 예측된 클래스 (label)
+     print(predicted_class)
+     # 제대로 된 class로 바꾸기
+     predicted_class = get_original_class(predicted_class)
      print(predicted_class)
 
      # 예측된 클래스에 해당하는 건물 정보 가져오기
