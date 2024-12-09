@@ -19,7 +19,7 @@ class Custom_ResNet(nn.Module) :
 
     self.fc_mid = nn.Linear(512, 256)  # New fully connected layer
 
-    self.resnet.fc_building = nn.Linear(256, 30)
+    self.resnet.fc_building = nn.Linear(256, 88)
 
 
   def forward(self, x):
