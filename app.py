@@ -1,4 +1,6 @@
 import streamlit as st
+import torch.nn.functional as F
+import torchvision.transforms as transforms
 from PIL import Image
 import os
 import torch
@@ -15,32 +17,38 @@ def save_uploaded_img(directory, file):
 
 st.title('UNIST! Where is it?')
 
+
 st.subheader('Upload your photo 📷 ')
 img_file = st.file_uploader('► Upload Only UNIST Place ↓', type=['png', 'jpg', 'jpeg'])
 
+test_transforms = transforms.Compose([
+    transforms.Resize((224, 224)),  # 테스트 데이터는 크기만 조정
+    transforms.ToTensor(),
+    transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+])
+
 if img_file is not None:
-     save_uploaded_img('input_img', img_file)
+     # save_uploaded_img('input_img', img_file)
 
      # 모델 불러오기
      model = Custom_ResNet()
 
      # CUDA 환경 확인 및 map_location 설정
      device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-     model.load_state_dict(torch.load('./train_weights.pth', map_location=device))
+     model.load_state_dict(torch.load('./100_weight.pth', map_location=device))
 
      model = model.to(device)
      model.eval()  # 평가 모드로 설정
 
 
      # 이미지를 numpy 배열로 변환하고 224x224 크기로 리사이즈
-     img = Image.open(img_file).resize((224, 224))
-     img = np.array(img).astype(np.float32) 
-     img = torch.tensor(img).permute(2, 0, 1)  # C, H, W 순서로 바꾸기 (채널, 높이, 너비)
-     img = img.unsqueeze(0)  # 배치 차원 추가 (1, C, H, W)
-
+     img = Image.open(img_file).convert('RGB')  # RGB로 변환 (Grayscale 방지)
+     img_tensor = test_transforms(img).unsqueeze(0).to(device)  # img to tensor
+    
      # 모델을 통해 예측 수행
      with torch.no_grad():
-          output_class = model(img)  # 모델 출력 (logits)
+          output_class = model(img_tensor)  # 모델 출력 (logits)
+          output_class = F.softmax(output_class, dim=1)
      predicted_class = torch.argmax(output_class, dim=1).item()  # 예측된 클래스 (label)
      print(predicted_class)
 
