@@ -6,7 +6,7 @@ import os
 import torch
 import numpy as np
 from mymodel import Custom_ResNet
-import building_info  # 이 부분은 이전에 작성한 building_info 모듈을 사용
+import building_info  
 
 def save_uploaded_img(directory, file):
      if not os.path.exists(directory):
@@ -18,7 +18,7 @@ def save_uploaded_img(directory, file):
 st.title('UNIST! Where is it?')
 
 test_transforms = transforms.Compose([
-    transforms.Resize((224, 224)),  # 테스트 데이터는 크기만 조정
+    transforms.Resize((224, 224)),  
     transforms.ToTensor(),
     transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
 ])
