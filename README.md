@@ -1,4 +1,4 @@
-#### This is Project for UNIST CSE36201 Course.
+#### This is a project for UNIST CSE36201 Course.
 
 <br>
 
