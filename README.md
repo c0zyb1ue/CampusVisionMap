@@ -28,7 +28,8 @@
 $ streamlit run app.py
 ```
 ## Web Page 
-
-<img src="/images/web1.png" alt="Image 1" width="30%">
-<img src="/images/web2.png" alt="Image 2" width="30%">
-<img src="//images/web3.png" alt="Image 3" width="30%">
+<div style="display: flex; justify-content: space-around; align-items: center;">
+     <img src="/images/web1.png" alt="Image 1" width="30%">
+     <img src="/images/web2.png" alt="Image 2" width="30%">
+     <img src="/images/web3.png" alt="Image 3" width="30%">
+</div>
