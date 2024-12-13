@@ -111,11 +111,11 @@ if img_file is not None:
           try:
                map_img = Image.open(ppmap_img_path)
           except:
-               map_img = Image.open('./test_map_img.png')  # 기본 지도 이미지
+               map_img = Image.open('./images/test_map_img.png')  # 기본 지도 이미지
           try:
                place_img = Image.open(building_img_path)
           except:
-               place_img = Image.open('./test_place_img.png')  # 기본 건물 이미지
+               place_img = Image.open('./images/test_place_img.png')  # 기본 건물 이미지
           with tab1:
                st.image(map_img)
           with tab2:

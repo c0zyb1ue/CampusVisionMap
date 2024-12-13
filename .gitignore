@@ -1,1 +1,10 @@
 /preprocessing_dataset
+
+# Ignore distribution directories
+.dist/
+
+# Ignore Python cache directories
+__pycache__/
+
+# Ignore macOS system files
+.DS_Store
